@@ -1,66 +1,52 @@
-const contractAddress = "ВАШ_АДРЕС_КОНТРАКТА"; // Вставь сюда адрес после деплоя
-const contractABI = [ /* ВСТАВЬ СЮДА ABI ИЗ REMIX */ ];
+// ДАННЫЕ ДЛЯ ОТОБРАЖЕНИЯ (Меняй их здесь)
+const userData = {
+    level: 2,           // Текущий уровень (1-5)
+    balance: "0.45",    // Баланс пользователя
+    referrals: 5        // Сколько человек уже в уровне
+};
 
-let provider, signer, contract;
-
-// Пороги кругов для уровней 1, 2, 3, 4, 5
 const thresholds = [0, 2, 6, 14, 30, 62];
 
-async function init() {
-    if (window.ethereum) {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        contract = new ethers.Contract(contractAddress, contractABI, signer);
-        
-        updateUI();
-    } else {
-        alert("Установите MetaMask!");
-    }
-}
-
-async function updateUI() {
-    const userAddr = await signer.getAddress();
-    const user = await contract.users(userAddr);
+window.onload = function() {
+    render();
     
-    const level = user.level.toNumber();
-    const internalBalance = ethers.utils.formatEther(user.internalBalance);
-    const referralsInLevel = user.referralsInLevel.toNumber();
+    const btn = document.getElementById('connectBtn');
+    if(btn) {
+        btn.onclick = () => {
+            btn.innerText = "Подключено";
+            render();
+        };
+    }
+};
 
+function render() {
     const statsSection = document.getElementById('statsSection');
-    const balanceText = document.getElementById('balance');
+    const balanceEl = document.getElementById('balance');
+    const levelEl = document.getElementById('userLevel');
     const container = document.getElementById('circlesContainer');
 
-    // ЛОГИКА: Если уровень выше 5 или равен 0 (не зарегистрирован), скрываем всё
-    if (level > 5 || level === 0) {
-        statsSection.style.display = 'none';
+    // 1. Условие: если уровень выше 5, скрываем всё
+    if (userData.level > 5 || userData.level === 0) {
+        if(statsSection) statsSection.style.display = 'none';
         return;
     }
 
-    // Иначе показываем и обновляем данные
-    statsSection.style.display = 'block';
-    balanceText.innerText = internalBalance;
+    // 2. Обновляем текст
+    if(balanceEl) balanceEl.innerText = userData.balance;
+    if(levelEl) levelEl.innerText = userData.level;
 
-    // Рисуем круги
-    container.innerHTML = ''; // Очищаем старые
-    const totalCircles = thresholds[level];
+    // 3. Рисуем сетку кругов
+    if(container) {
+        container.innerHTML = '';
+        const total = thresholds[userData.level];
 
-    for (let i = 0; i < totalCircles; i++) {
-        const div = document.createElement('div');
-        div.classList.add('circle');
-        
-        // Если индекс меньше количества рефералов — затемняем
-        if (i < referralsInLevel) {
-            div.classList.add('dark');
+        for (let i = 0; i < total; i++) {
+            const div = document.createElement('div');
+            div.className = 'circle';
+            if (i < userData.referrals) {
+                div.classList.add('dark');
+            }
+            container.appendChild(div);
         }
-        
-        container.appendChild(div);
     }
 }
-
-// Запуск при загрузке или по нажатию кнопки
-document.addEventListener('DOMContentLoaded', () => {
-    // Если у тебя есть кнопка с id="connectBtn"
-    const btn = document.getElementById('connectBtn');
-    if(btn) btn.onclick = init;
-});
