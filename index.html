@@ -4,24 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SparkPoint Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <style>
+        /* Весь дизайн здесь */
+        body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 400px; width: 100%; }
+        .logo { color: #f0b90b; font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: left; width: 100%; }
+        .card { background: #1e1e1e; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .yellow-btn { background: #f0b90b; color: black; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; margin-bottom: 20px; }
+        .balance-box { font-size: 32px; color: #f0b90b; border: 2px solid #f0b90b; padding: 20px; border-radius: 12px; text-align: center; margin: 10px 0; font-weight: bold; }
+        h3 { margin: 0 0 10px 0; color: #aaa; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        #circlesContainer { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 15px; }
+        .circle { width: 22px; height: 22px; border: 2px solid #f0b90b; border-radius: 50%; transition: 0.3s; }
+        .circle.dark { background-color: #f0b90b; box-shadow: 0 0 8px #f0b90b; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>SparkPoint</h1>
-        <button id="connectBtn">Подключить кошелек</button>
 
-        <div id="dashboard" style="display: none;">
-            <div class="info-row">
-                <h3>Ваш уровень: <span id="userLevel">-</span></h3>
-                <h3 id="balanceContainer">Баланс накопления: <span id="internalBalance">0</span> BNB</h3>
+    <div class="container">
+        <div class="logo">⚡ SparkPoint</div>
+        
+        <button id="connectBtn" class="yellow-btn">ПОДКЛЮЧИТЬ КОШЕЛЕК</button>
+
+        <div id="mainDashboard" class="hidden">
+            <div class="card">
+                <h3>💰 Твой Баланс</h3>
+                <div class="balance-box"><span id="balance">0</span> BNB</div>
             </div>
 
-            <div id="circlesContainer">
-                </div>
+            <div class="card">
+                <h3>📊 Уровень <span id="userLevel">0</span></h3>
+                <div id="circlesContainer"></div>
+            </div>
         </div>
     </div>
-    <script src="app.js"></script>
+
+    <script>
+        // ЛОГИКА САЙТА (Демо-режим без деплоя)
+        const user = {
+            level: 2,         // Уровень участника (от 1 до 5)
+            balance: "0.45",  // Сколько денег на балансе
+            referrals: 4      // Сколько кругов закрасить (рефералы)
+        };
+
+        const thresholds = [0, 2, 6, 14, 30, 62];
+
+        document.getElementById('connectBtn').onclick = function() {
+            // Прячем кнопку, показываем статистику
+            this.style.display = 'none';
+            const dashboard = document.getElementById('mainDashboard');
+            
+            // Если уровень 1-5 — рисуем
+            if (user.level >= 1 && user.level <= 5) {
+                dashboard.classList.remove('hidden');
+                document.getElementById('balance').innerText = user.balance;
+                document.getElementById('userLevel').innerText = user.level;
+
+                const container = document.getElementById('circlesContainer');
+                container.innerHTML = ''; // Чистим место
+                
+                const total = thresholds[user.level]; // Например, 6 кругов для 2 уровня
+
+                for (let i = 0; i < total; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'circle';
+                    if (i < user.referrals) {
+                        div.classList.add('dark'); // Закрашиваем
+                    }
+                    container.appendChild(div);
+                }
+            } else {
+                alert("Доступно только для уровней 1-5");
+            }
+        };
+    </script>
 </body>
 </html>
