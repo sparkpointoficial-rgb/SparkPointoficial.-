@@ -3,70 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SparkPoint | Автоматический BNB Смарт-Контракт</title>
+    <title>SparkPoint</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
-        :root { --accent: #f3ba2f; --bg: #0b0e11; --card: #1e2329; --text: #eaecef; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; padding: 40px 0; }
-        h1 { color: var(--accent); font-size: 2.5rem; letter-spacing: 2px; margin: 0; }
-        .card { background: var(--card); border-radius: 16px; padding: 25px; margin: 20px 0; border: 1px solid #474d57; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .btn { background: var(--accent); color: black; padding: 16px 32px; border-radius: 12px; font-weight: bold; border: none; width: 100%; cursor: pointer; font-size: 18px; transition: 0.3s; }
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        body { background: #0b0b0b; color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .card { background: #181818; border-radius: 20px; padding: 25px; border: 1px solid #333; margin-bottom: 20px; }
+        .btn { background: #f3ba2f; color: black; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .logo { color: #f3ba2f; font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+        .sub-text { color: #888; font-size: 14px; margin-bottom: 30px; }
         
-        /* Стили из твоего первого скрина */
-        .balance-box { border: 2px solid var(--accent); border-radius: 12px; padding: 20px; text-align: center; margin-top: 10px; }
-        .balance-val { font-size: 32px; color: var(--accent); font-weight: bold; }
+        /* Стили кабинета */
+        .balance-box { border: 2px solid #f3ba2f; border-radius: 15px; padding: 25px; color: #f3ba2f; font-size: 32px; font-weight: bold; }
         .circle-group { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .circle { width: 25px; height: 25px; border: 2px solid var(--accent); border-radius: 50%; }
-        .circle.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-        
-        .status-box { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
-        .price-info { text-align: center; margin: 15px 0; border: 1px dashed var(--accent); padding: 10px; border-radius: 8px; }
-        #refLinkDisplay { background: #000; padding: 15px; border-radius: 8px; font-size: 13px; color: var(--accent); margin-top: 10px; word-break: break-all; border: 1px solid #333; }
+        .circle { width: 25px; height: 25px; border: 2px solid #f3ba2f; border-radius: 50%; }
+        .circle.active { background: #f3ba2f; box-shadow: 0 0 10px #f3ba2f; }
+        .ref-box { background: #000; padding: 15px; border-radius: 10px; border: 1px solid #333; color: #f3ba2f; font-size: 12px; word-break: break-all; margin-top: 15px; }
         
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>⚡ SparkPoint</h1>
-        <p style="color: #888; font-size: 14px;">login browsers Trust Wallet SafePal MetaMask</p>
-    </header>
+    <div class="logo">⚡ SparkPoint</div>
+    <div class="sub-text">login browsers Trust Wallet SafePal MetaMask</div>
 
-    <div class="card" id="connectCard">
-        <div class="status-box">
-            <span>Ваш кошелек:</span>
-            <span id="walletAddr">Не подключен</span>
-        </div>
-        <button id="connectBtn" class="btn">ПОДКЛЮЧИТЬ КОШЕЛЕК</button>
+    <div id="step1" class="card">
+        <p style="text-align: left;">Ваш кошелек: <span id="addr" style="float: right; color: #888;">Не подключен</span></p>
+        <button id="btnConnect" class="btn">ПОДКЛЮЧИТЬ КОШЕЛЕК</button>
     </div>
 
-    <div id="paymentUI" class="hidden">
-        <div class="card">
-            <h3>Вход в проект (Уровень 1)</h3>
-            <div class="price-info">
-                Стоимость: <strong>$10 USD</strong><br>
-                <small id="bnbPriceDisplay">Загрузка курса...</small>
-            </div>
-            <p>Пригласитель: <span id="refAddr" style="color: var(--accent);">0x00...</span></p>
-            <button id="registerBtn" class="btn">ОПЛАТИТЬ И НАЧАТЬ</button>
+    <div id="step2" class="card hidden">
+        <h3 style="text-align: left;">Вход в проект (Уровень 1)</h3>
+        <div style="border: 1px dashed #f3ba2f; padding: 15px; border-radius: 10px; margin: 20px 0;">
+            Стоимость: <b>$10 USD</b><br>
+            <small id="bnbPrice">~ 0.0105 BNB</small>
         </div>
+        <p style="text-align: left;">Пригласитель: <span style="color: #f3ba2f;">0x0c4F...3D8a</span></p>
+        <button id="btnPay" class="btn">ОПЛАТИТЬ И НАЧАТЬ</button>
     </div>
 
-    <div id="dashboardUI" class="hidden">
+    <div id="step3" class="hidden">
         <div class="card">
-            <h3>💰 ТВОЙ БАЛАНС</h3>
-            <div class="balance-box">
-                <div class="balance-val">0.45 BNB</div>
-            </div>
+            <h3 style="text-align: left; color: #888;">💰 ТВОЙ БАЛАНС</h3>
+            <div class="balance-box">0.45 BNB</div>
         </div>
 
         <div class="card">
-            <h3>📊 УРОВЕНЬ 2</h3>
+            <h3 style="text-align: left; color: #888;">📊 УРОВЕНЬ 2</h3>
             <div class="circle-group">
                 <div class="circle active"></div>
                 <div class="circle active"></div>
@@ -78,61 +61,35 @@
         </div>
 
         <div class="card">
-            <h3>🔗 Ваша ссылка (пригласи 2 участника)</h3>
-            <p style="font-size: 14px; color: #888;">Отправьте друзьям для регистрации:</p>
-            <div id="refLinkDisplay"></div>
+            <h3 style="text-align: left; color: #888;">🔗 Ваша ссылка</h3>
+            <p style="text-align: left; font-size: 14px;">Для продвижения нужно пригласить 2 участника:</p>
+            <div id="refLink" class="ref-box"></div>
         </div>
     </div>
-</div>
 
-<script>
-    let provider, signer, userAddress;
+    <script>
+        let userAddr = "";
 
-    const params = new URLSearchParams(window.location.search);
-    let referrer = params.get('ref') || "0x0000000000000000000000000000000000000000";
+        // Шаг 1: Коннект
+        document.getElementById('btnConnect').onclick = async function() {
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddr = accounts[0];
+                document.getElementById('addr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+            } else {
+                alert("Открой в Trust Wallet!");
+            }
+        };
 
-    async function init() {
-        if (referrer !== "0x0000000000000000000000000000000000000000") {
-            document.getElementById('refAddr').innerText = referrer.substring(0,6) + "..." + referrer.substring(38);
-        }
-        try {
-            const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
-            const data = await response.json();
-            const bnbPrice = parseFloat(data.price);
-            const bnbAmount = (10 / bnbPrice).toFixed(4);
-            document.getElementById('bnbPriceDisplay').innerText = `~ ${bnbAmount} BNB`;
-        } catch(e) { console.log("Ошибка курса"); }
-    }
-
-    async function connect() {
-        if (window.ethereum) {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-            userAddress = await signer.getAddress();
-            
-            document.getElementById('walletAddr').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-            document.getElementById('connectBtn').classList.add('hidden');
-            document.getElementById('paymentUI').classList.remove('hidden');
-        } else {
-            alert("Пожалуйста, откройте в крипто-кошельке!");
-        }
-    }
-
-    // Имитация оплаты для показа кабинета
-    async function pay() {
-        alert("Транзакция отправлена...");
-        document.getElementById('paymentUI').classList.add('hidden');
-        document.getElementById('dashboardUI').classList.remove('hidden');
-        
-        const link = window.location.origin + window.location.pathname + "?ref=" + userAddress;
-        document.getElementById('refLinkDisplay').innerText = link;
-    }
-
-    document.getElementById('connectBtn').onclick = connect;
-    document.getElementById('registerBtn').onclick = pay;
-    init();
-</script>
-
+        // Шаг 2: Оплата
+        document.getElementById('btnPay').onclick = function() {
+            // Тут будет вызов смарт-контракта, пока просто открываем кабинет
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('refLink').innerText = window.location.href + "?ref=" + userAddr;
+        };
+    </script>
 </body>
 </html>
